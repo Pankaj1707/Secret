@@ -56,7 +56,7 @@ const userSchema  = new mongoose.Schema(
 
 
 
-userSchema.plugin(encrypt, {secret:"whoamI", encryptedFields: ["password"]});
+userSchema.plugin(encrypt, {secret:process.env.secret, encryptedFields: ["password"]});
 
 // userSchema.plugin(passportLocalMongoose);  
 // userSchema.plugin(findOrCreate);

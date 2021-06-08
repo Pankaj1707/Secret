@@ -4,12 +4,9 @@ const ejs = require("ejs");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 //const encrypt = require("mongoose-encryption");      /// Required for 2nd Level Authentication ////
-const md5 = require("md5");
-
-
-
-// const bcrypt = require("bcrypt");
-// const saltRounds = 10;
+//const md5 = require("md5");            /// Required for 3rd level of Authentication     ///// Just adding md5 for 3rd level security 
+const bcrypt = require("bcrypt");       /// Required for 4rth level of Authentication
+const saltRounds = 10;
 // const session = require("express-session");
 // const passport = require("passport");
 // const passportLocalMongoose = require("passport-local-mongoose");
@@ -134,23 +131,38 @@ app.get("/register", function(req, res)
     res.render("register");
 });
 
+
+
+
 app.post("/register", function(req, res)
 {
-      const user = new User({
-        email : req.body.username,
-        password : md5(req.body.password)
-      })
+      
 
-      user.save(function(err)
+      bcrypt.hash(req.body.password,saltRounds, function(err, hash)
       {
           if(err)
           {
-              res.send(err)
+              console.log(err);
           }
           else{
-              res.render("secrets")
+            const user = new User({
+                email : req.body.username,
+                password : hash    
+              })
+              user.save(function(err)
+              {
+                  if(err)
+                  {
+                      res.send(err)
+                  }
+                  else{
+                      res.render("secrets")
+                  }
+              })
           }
       })
+
+      
 })
 
 app.post("/login", function(req, res)
@@ -162,13 +174,24 @@ app.post("/login", function(req, res)
         {
             console.log(err);
         }
-     else {
-         if(result.password===md5(req.body.password))
-       {
-        res.render("secrets");
-       }
+     else 
+     {
+        bcrypt.compare(req.body.password, result.password, function(err, result)
+        {
+            if(err)
+            {
+                console.log(err);
+            }
+            else
+            {
+                if(result)
+                {
+                    res.render("secrets")
+                }
+            }
+        })
+     }
       
-    }
        
     })
       

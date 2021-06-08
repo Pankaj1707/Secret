@@ -50,8 +50,8 @@ const userSchema  = new mongoose.Schema(
     {
        username : String,
        password : String,
-       googleId: String
-    //    secret:String
+       googleId: String,
+       secret:  String
     }
 )
 
@@ -216,16 +216,7 @@ app.get("/register", function(req, res)
 
 //////////////////////////////5th and 6th level of security with passport///////////////////////////////////////////////
 
-app.get("/secrets", function(req, res)
-{
-    if(req.isAuthenticated())
-    {
-        res.render("secrets");
-    }
-    else{
-        res.redirect("/login");
-    }
-})
+
 
 app.get("/logout", function(req, res)
 {
@@ -282,7 +273,55 @@ app.post("/login", function(req, res)
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+/////////////////////////////////submiiting a secret ////////////////////////////////////////////////////////////
 
+app.get("/secrets", function(req, res)
+{
+    
+   User.find({secret:{$ne:null}}, function(err, foundSecrets)
+   {
+       if(err)
+       {
+           console.log(err);
+       }
+       else{
+        res.render("secrets", {foundSecrets:foundSecrets})
+       }
+   })
+
+
+   
+})
+
+
+app.get("/submit", function(req, res)
+{ 
+    if(req.isAuthenticated())
+    {
+        res.render("submit");
+    }
+
+    else{
+        res.redirect("/login");
+    }
+})
+
+app.post("/submit", function(req, res)
+{
+    
+    User.findById(req.user.id, function(err, foundUser)
+    {
+        foundUser.secret = req.body.secret;
+        foundUser.save(function(err)
+        {
+            res.redirect("/secrets")
+        })
+     
+    })
+})
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 

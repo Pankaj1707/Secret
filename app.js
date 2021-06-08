@@ -3,9 +3,11 @@ const express = require("express");
 const ejs = require("ejs");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
-const encrypt = require("mongoose-encryption");
+//const encrypt = require("mongoose-encryption");      /// Required for 2nd Level Authentication ////
+const md5 = require("md5");
 
-// const md5 = require("md5");
+
+
 // const bcrypt = require("bcrypt");
 // const saltRounds = 10;
 // const session = require("express-session");
@@ -56,12 +58,25 @@ const userSchema  = new mongoose.Schema(
 
 
 
-userSchema.plugin(encrypt, {secret:process.env.secret, encryptedFields: ["password"]});
+
+///////////////////////////2nd Level Authentication with Mongoose Encryption and Environment Variable/////////////////
+
+//userSchema.plugin(encrypt, {secret:process.env.secret, encryptedFields: ["password"]});
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+
+
+
 
 // userSchema.plugin(passportLocalMongoose);  
 // userSchema.plugin(findOrCreate);
 
-// userSchema.plugin(encrypt, {secret: process.env.SECRET, encryptedFields:["password"]});
 
 
 
@@ -123,7 +138,7 @@ app.post("/register", function(req, res)
 {
       const user = new User({
         email : req.body.username,
-        password : req.body.password
+        password : md5(req.body.password)
       })
 
       user.save(function(err)
@@ -148,7 +163,7 @@ app.post("/login", function(req, res)
             console.log(err);
         }
      else {
-         if(result.password===req.body.password)
+         if(result.password===md5(req.body.password))
        {
         res.render("secrets");
        }

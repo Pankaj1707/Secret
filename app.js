@@ -3,7 +3,7 @@ const express = require("express");
 const ejs = require("ejs");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
-// const encrypt = require("mongoose-encryption");
+const encrypt = require("mongoose-encryption");
 
 // const md5 = require("md5");
 // const bcrypt = require("bcrypt");
@@ -53,6 +53,10 @@ const userSchema  = new mongoose.Schema(
     //    secret:String
     }
 )
+
+
+
+userSchema.plugin(encrypt, {secret:"whoamI", encryptedFields: ["password"]});
 
 // userSchema.plugin(passportLocalMongoose);  
 // userSchema.plugin(findOrCreate);
